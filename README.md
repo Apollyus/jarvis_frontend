@@ -1,73 +1,86 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Analýza a příprava projektu - zkontrolovat závislosti a strukturu
 
-Currently, two official plugins are available:
+Not Started
+×
+Instalace potřebných npm balíčků (react-markdown, date-fns, lucide-react, zustand)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Not Started
+×
+Vytvoření konfiguračního systému (.env support pro dev/prod prostředí)
 
-## React Compiler
+Not Started
+×
+Návrh TypeScript typů a rozhraní (zprávy, konverzace, uživatel, config)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Not Started
+×
+Vytvoření API service vrstvy (login, WebSocket komunikace)
 
-## Expanding the ESLint configuration
+Not Started
+×
+Implementace Zustand store pro globální state (auth, konverzace, nastavení)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Not Started
+×
+Vytvoření login komponenty s formulářem (username/password)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Not Started
+×
+Implementace protected route logiky a persistence auth stavu
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Not Started
+×
+Vytvoření hlavního layout s postranním panelem a hlavičkou
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Not Started
+×
+Implementace sidebar komponenty s historií konverzací
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Not Started
+×
+Vytvoření chat komponenty pro zobrazení zpráv s markdown podporou
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Not Started
+×
+Implementace input komponenty (multi-line, Enter/Shift+Enter, auto-resize)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Not Started
+×
+Přidání funkce kopírování zpráv do schránky
+
+Not Started
+×
+Implementace exportu konverzace (JSON, TXT, MD formáty)
+
+Not Started
+×
+Vytvoření theme systému pro tmavý/světlý režim s přepínačem
+
+Not Started
+×
+Implementace localStorage pro perzistenci konverzací a nastavení
+
+Not Started
+×
+Přidání status indikátorů (typing, connecting, disconnected, error)
+
+Not Started
+×
+Implementace WebSocket reconnect logiky a error handlingu
+
+Not Started
+×
+Responzivní styling pro mobile/tablet/desktop
+
+Not Started
+×
+Vytvoření české dokumentace (README.md, komentáře v kódu)
+
+Not Started
+×
+Kompletní testování aplikace a oprava bugů
+
+Not Started
+×
++ Add Todo
