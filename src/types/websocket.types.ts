@@ -8,7 +8,7 @@ export type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'er
  */
 export interface WSMessage {
   type: 'status' | 'response' | 'error';
-  content?: string;
+  message?: string;
   error?: string;
   timestamp?: number;
 }

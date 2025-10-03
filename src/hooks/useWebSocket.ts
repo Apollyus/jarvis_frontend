@@ -5,6 +5,7 @@
 import { useEffect, useCallback } from 'react';
 import { useWebSocketStore } from '../stores/websocketStore';
 import { useChatStore } from '../stores/chatStore';
+import { useSessionStore } from '../stores/sessionStore';
 import { WebSocketService } from '../services/websocketService';
 import type { WSMessage, WSOutgoingMessage } from '../types';
 
@@ -21,7 +22,46 @@ export const useWebSocket = () => {
     resetReconnectAttempts,
   } = useWebSocketStore();
 
-  const { setAgentTyping } = useChatStore();
+  const { addMessage, setAgentTyping } = useChatStore();
+  const { activeSessionId } = useSessionStore();
+
+  // Handler pro příchozí zprávy
+  const handleMessage = useCallback((message: WSMessage) => {
+    console.log('🔵 WebSocket received message:', message);
+    
+    if (message.type === 'response' && message.message) {
+      if (!activeSessionId) {
+        console.error('Chyba: Přijata zpráva od agenta, ale není aktivní session.');
+        return;
+      }
+      // Agent odpověď
+      addMessage({
+        sessionId: activeSessionId,
+        role: 'agent',
+        content: message.message,
+        status: 'sent',
+      });
+      setAgentTyping(false);
+    } else if (message.type === 'status') {
+      // Status zpráva (např. "agent začal psát")
+      if (message.message === 'typing') {
+        setAgentTyping(true);
+      }
+    } else if (message.type === 'error') {
+      // Chybová zpráva
+      setError(message.error || 'Neznámá chyba');
+      setAgentTyping(false);
+    }
+  }, [activeSessionId, addMessage, setAgentTyping, setError]);
+
+  // Handler pro změnu stavu připojení
+  const handleStatusChange = useCallback((newStatus: string) => {
+    setStatus(newStatus as any);
+    
+    if (newStatus === 'connected') {
+      resetReconnectAttempts();
+    }
+  }, [setStatus, resetReconnectAttempts]);
 
   // Nastavit message listener při mount
   useEffect(() => {
@@ -32,38 +72,7 @@ export const useWebSocket = () => {
       unsubscribeMessage();
       unsubscribeStatus();
     };
-  }, []);
-
-  // Handler pro příchozí zprávy
-  const handleMessage = useCallback((message: WSMessage) => {
-    console.log('🔵 WebSocket received message:', message);
-    
-    if (message.type === 'response' && message.content) {
-      // Agent odpověď
-      console.log('📨 Agent response received:', message.content);
-      setAgentTyping(false);
-      // TODO: Přidat zprávu od agenta (sessionId se nastaví z aktivní session)
-      console.warn('⚠️ Agent message NOT added to store - this is the bug!');
-    } else if (message.type === 'status') {
-      // Status zpráva (např. "agent začal psát")
-      if (message.content === 'typing') {
-        setAgentTyping(true);
-      }
-    } else if (message.type === 'error') {
-      // Chybová zpráva
-      setError(message.error || 'Neznámá chyba');
-      setAgentTyping(false);
-    }
-  }, [setAgentTyping, setError]);
-
-  // Handler pro změnu stavu připojení
-  const handleStatusChange = useCallback((newStatus: string) => {
-    setStatus(newStatus as any);
-    
-    if (newStatus === 'connected') {
-      resetReconnectAttempts();
-    }
-  }, [setStatus, resetReconnectAttempts]);
+  }, [handleMessage, handleStatusChange]);
 
   // Odeslat zprávu
   const send = useCallback((message: WSOutgoingMessage) => {

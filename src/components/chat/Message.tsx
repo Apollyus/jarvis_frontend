@@ -39,7 +39,7 @@ export const Message = ({ message }: MessageProps) => {
               : 'bg-white border border-gray-200 text-gray-900'
           }`}
         >
-          <p className="whitespace-pre-wrap break-words">{message.content}</p>
+          <p className="whitespace-pre-wrap break-words text-gray-900">{message.content}</p>
           {message.error && (
             <p className="text-xs mt-1 text-red-200">Chyba: {message.error}</p>
           )}

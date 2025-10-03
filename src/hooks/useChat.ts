@@ -52,8 +52,11 @@ export const useChat = () => {
           timestamp: Date.now(),
         });
 
-        // Aktualizovat status na sent
-        updateMessageStatus(userMessage.id, 'sent');
+        // Aktualizovat status na sent s malým zpožděním, aby se předešlo race condition
+        // se přidáním zprávy do stavu.
+        setTimeout(() => {
+          updateMessageStatus(userMessage.id, 'sent');
+        }, 0);
 
         // Aktualizovat session
         updateSessionLastMessage(activeSessionId);
