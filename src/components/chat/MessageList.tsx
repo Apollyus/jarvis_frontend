@@ -24,7 +24,7 @@ export const MessageList = ({ messages, isAgentTyping }: MessageListProps) => {
 
   if (messages.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center text-gray-500">
+      <div className="flex-1 flex items-center justify-center text-gray-500 dark:text-gray-400">
         <div className="text-center">
           <p className="text-lg mb-2">👋</p>
           <p>Zatím žádné zprávy</p>

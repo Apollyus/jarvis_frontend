@@ -20,7 +20,7 @@ export const LoginForm = () => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Uživatelské jméno
         </label>
         <input
@@ -28,7 +28,7 @@ export const LoginForm = () => {
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="input-field"
+          className="input-field bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
           placeholder="Zadejte uživatelské jméno"
           required
           disabled={isLoading}
@@ -37,7 +37,7 @@ export const LoginForm = () => {
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Heslo
         </label>
         <input
@@ -45,7 +45,7 @@ export const LoginForm = () => {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="input-field"
+          className="input-field bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
           placeholder="Zadejte heslo"
           required
           disabled={isLoading}
@@ -54,7 +54,7 @@ export const LoginForm = () => {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/30 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg text-sm">
           {error}
         </div>
       )}

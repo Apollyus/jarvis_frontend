@@ -35,7 +35,7 @@ export const ChatInput = ({
   };
 
   return (
-    <div className="border-t border-gray-200 bg-white p-4">
+    <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
       <div className="flex gap-2">
         <textarea
           value={message}
@@ -44,7 +44,7 @@ export const ChatInput = ({
           placeholder={placeholder}
           disabled={disabled}
           rows={1}
-          className="flex-1 resize-none input-field min-h-[44px] max-h-32"
+          className="flex-1 resize-none input-field bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 min-h-[44px] max-h-32"
           style={{
             height: 'auto',
             minHeight: '44px',
@@ -64,7 +64,7 @@ export const ChatInput = ({
           <span className="text-lg">➤</span>
         </button>
       </div>
-      <p className="text-xs text-gray-500 mt-2">
+      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
         Enter pro odeslání, Shift+Enter pro nový řádek
       </p>
     </div>

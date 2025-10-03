@@ -28,7 +28,7 @@ export const ChatContainer = () => {
   const sessionTitle = activeSession?.title || SESSION_DEFAULTS.DEFAULT_TITLE;
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
+    <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-800">
       <ChatHeader
         sessionTitle={sessionTitle}
         connectionStatus={status}

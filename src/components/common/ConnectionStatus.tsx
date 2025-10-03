@@ -40,9 +40,9 @@ export const ConnectionStatus = ({ status, reconnectAttempts = 0 }: ConnectionSt
       <span className={`w-2 h-2 ${config.color} rounded-full`} aria-hidden="true">
         {config.icon}
       </span>
-      <span className="text-gray-700">{config.text}</span>
+      <span className="text-gray-700 dark:text-gray-300">{config.text}</span>
       {reconnectAttempts > 0 && (
-        <span className="text-gray-500 text-xs">
+        <span className="text-gray-500 dark:text-gray-400 text-xs">
           (pokus {reconnectAttempts})
         </span>
       )}

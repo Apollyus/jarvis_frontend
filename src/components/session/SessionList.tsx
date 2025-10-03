@@ -20,7 +20,7 @@ export const SessionList = () => {
 
       <div className="flex-1 overflow-y-auto px-4 pb-4">
         {sortedSessions.length === 0 ? (
-          <div className="text-center text-gray-500 text-sm mt-8">
+          <div className="text-center text-gray-500 dark:text-gray-400 text-sm mt-8">
             <p>Zatím žádné konverzace</p>
             <p className="text-xs mt-1">Vytvořte novou konverzaci výše</p>
           </div>
