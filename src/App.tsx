@@ -1,35 +1,51 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+/**
+ * App - Hlavní aplikační komponenta
+ */
+
+import { useEffect } from 'react';
+import { useAuth } from './hooks/useAuth';
+import { useSession } from './hooks/useSession';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
+import { AppLayout } from './components/layout/AppLayout';
+import { ChatContainer } from './components/chat/ChatContainer';
+import { LoginPage } from './pages/LoginPage';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { isAuthenticated, restoreSession } = useAuth();
+  const { loadSessions, createSession, sessions, activeSessionId } = useSession();
 
+  // Při mount obnovit session a načíst sessions
+  useEffect(() => {
+    restoreSession();
+  }, [restoreSession]);
+
+  // Načíst sessions po přihlášení
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadSessions();
+    }
+  }, [isAuthenticated, loadSessions]);
+
+  // Vytvořit první session pokud žádná neexistuje
+  useEffect(() => {
+    if (isAuthenticated && sessions.length === 0 && !activeSessionId) {
+      createSession();
+    }
+  }, [isAuthenticated, sessions.length, activeSessionId, createSession]);
+
+  // Pokud není přihlášen, zobrazit login
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
+
+  // Hlavní aplikace
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <ErrorBoundary>
+      <AppLayout>
+        <ChatContainer />
+      </AppLayout>
+    </ErrorBoundary>
+  );
 }
 
-export default App
+export default App;
