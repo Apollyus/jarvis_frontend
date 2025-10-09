@@ -73,6 +73,21 @@ export const useChat = () => {
     (content: string) => {
       if (!activeSessionId) return;
 
+      // Prevent duplicate agent messages: if the most recent agent message
+      // already has the same content, don't add it again. This covers the
+      // case where both the websocket handler and other logic might try to
+      // insert the same agent reply.
+      const lastAgent = messages
+        .slice()
+        .reverse()
+        .find((m) => m.role === 'agent');
+
+      if (lastAgent && lastAgent.content === content) {
+        // Already have the same agent message — just ensure typing is false
+        setAgentTyping(false);
+        return;
+      }
+
       addMessage({
         sessionId: activeSessionId,
         role: 'agent' as MessageRole,

@@ -22,7 +22,7 @@ interface ChatStore {
   setError: (error: string | null) => void;
 }
 
-export const useChatStore = create<ChatStore>((set) => ({
+export const useChatStore = create<ChatStore>((set, get) => ({
   // Initial state
   messages: [],
   isAgentTyping: false,
@@ -30,6 +30,19 @@ export const useChatStore = create<ChatStore>((set) => ({
 
   // Přidat novou zprávu
   addMessage: (messageData) => {
+    // If this is an agent message, check the last agent message to avoid duplicates
+    if (messageData.role === 'agent') {
+      const lastAgent = get().messages
+        .slice()
+        .reverse()
+        .find((m) => m.role === 'agent');
+
+      if (lastAgent && lastAgent.content === messageData.content) {
+        console.log('💾 ChatStore: Duplicate agent message detected, skipping add.');
+        return lastAgent;
+      }
+    }
+
     const message: ChatMessage = {
       ...messageData,
       id: uuidv4(),
