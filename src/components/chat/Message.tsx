@@ -41,13 +41,11 @@ export const Message = ({ message }: MessageProps) => {
               : 'bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100'
           }`}
         >
-          {isUser ? (
-            <p className="whitespace-pre-wrap break-words">{message.content}</p>
-          ) : (
-            // Render agent messages as Markdown (supports GFM)
-            <div className="prose dark:prose-invert max-w-full whitespace-pre-wrap break-words">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
-            </div>
+          {isUser && <p className="whitespace-pre-wrap break-words">{message.content}</p>}
+          {!isUser && (
+            <ReactMarkdown className="prose dark:prose-invert max-w-full" remarkPlugins={[remarkGfm]}>
+              {message.content}
+            </ReactMarkdown>
           )}
 
           {message.error && (
