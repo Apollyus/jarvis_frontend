@@ -15,14 +15,24 @@ class WebSocketServiceClass {
   private messageCallbacks: MessageCallback[] = [];
   private statusCallbacks: StatusCallback[] = [];
   private currentApiKey: string | null = null;
+  private manuallyClosed = false;
 
   /**
    * Připojit WebSocket
    */
   connect(apiKey: string): void {
-    // Pokud už je připojeno, neděláme nic
-    if (this.ws?.readyState === WebSocket.OPEN) {
+    // Pokud už existuje socket, a je v procesu připojování nebo již otevřen,
+    // nepokoušíme se vytvořit nový - zabrání to duplikovaným spojením.
+    const wsState = this.ws?.readyState;
+    if (wsState === WebSocket.OPEN || wsState === WebSocket.CONNECTING) {
+      // už máme aktivní nebo probíhající spojení
       return;
+    }
+
+    // Ujistíme se, že starý reconnect timeout je zrušen
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout as any);
+      this.reconnectTimeout = null;
     }
 
     this.currentApiKey = apiKey;
@@ -52,9 +62,16 @@ class WebSocketServiceClass {
       this.reconnectTimeout = null;
     }
 
+    // Označíme, že bylo provedené manuální zavření (to zamezí reconnectu)
+    this.manuallyClosed = true;
+
     // Zavřít WebSocket
     if (this.ws) {
-      this.ws.close();
+      try {
+        this.ws.close();
+      } catch (e) {
+        console.error('Chyba při zavírání WebSocket:', e);
+      }
       this.ws = null;
     }
 
@@ -138,10 +155,16 @@ class WebSocketServiceClass {
   /**
    * Handler pro zavření spojení
    */
-  private handleClose(): void {
-    console.log('WebSocket odpojen');
+  private handleClose(event: CloseEvent): void {
+    console.log('WebSocket odpojen', { code: event.code, reason: event.reason });
     this.updateStatus('disconnected');
-    
+
+    // Pokud bylo explicitně zavřeno uživatelem, nedělej reconnect
+    if (this.manuallyClosed) {
+      this.manuallyClosed = false; // reset flag
+      return;
+    }
+
     // Pokusit se o reconnect
     if (this.currentApiKey && this.reconnectAttempts < API_CONFIG.MAX_RECONNECT_ATTEMPTS) {
       this.attemptReconnect();

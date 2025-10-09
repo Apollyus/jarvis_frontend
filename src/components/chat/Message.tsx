@@ -3,6 +3,8 @@
  */
 
 import type { ChatMessage } from '../../types';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface MessageProps {
   message: ChatMessage;
@@ -39,7 +41,15 @@ export const Message = ({ message }: MessageProps) => {
               : 'bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100'
           }`}
         >
-          <p className="whitespace-pre-wrap break-words">{message.content}</p>
+          {isUser ? (
+            <p className="whitespace-pre-wrap break-words">{message.content}</p>
+          ) : (
+            // Render agent messages as Markdown (supports GFM)
+            <div className="prose dark:prose-invert max-w-full whitespace-pre-wrap break-words">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
+            </div>
+          )}
+
           {message.error && (
             <p className="text-xs mt-1 text-red-200">Chyba: {message.error}</p>
           )}
