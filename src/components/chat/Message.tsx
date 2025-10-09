@@ -43,9 +43,11 @@ export const Message = ({ message }: MessageProps) => {
         >
           {isUser && <p className="whitespace-pre-wrap break-words">{message.content}</p>}
           {!isUser && (
-            <ReactMarkdown className="prose dark:prose-invert max-w-full" remarkPlugins={[remarkGfm]}>
-              {message.content}
-            </ReactMarkdown>
+            <div className="prose dark:prose-invert max-w-full">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {message.content}
+              </ReactMarkdown>
+            </div>
           )}
 
           {message.error && (
