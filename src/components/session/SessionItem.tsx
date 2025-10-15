@@ -29,10 +29,9 @@ export const SessionItem = ({ session, isActive, onSelect, onDelete }: SessionIt
   return (
     <div
       onClick={onSelect}
-      className="group relative px-3 py-3 rounded-lg cursor-pointer transition-all border"
+      className="group relative px-3 py-3 rounded-lg cursor-pointer transition-all"
       style={{
-        backgroundColor: isActive ? 'var(--color-primary-50)' : 'transparent',
-        borderColor: isActive ? 'var(--color-primary-200)' : 'transparent',
+        backgroundColor: isActive ? 'var(--color-background)' : 'transparent',
       }}
       onMouseEnter={(e) => {
         if (!isActive) {
@@ -50,7 +49,7 @@ export const SessionItem = ({ session, isActive, onSelect, onDelete }: SessionIt
           <h3
             className="text-sm font-medium truncate"
             style={{
-              color: isActive ? 'var(--color-primary-700)' : 'var(--color-text-primary)',
+              color: isActive ? 'var(--color-primary-600)' : 'var(--color-text-primary)',
             }}
           >
             {session.title}
