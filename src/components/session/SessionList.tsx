@@ -13,7 +13,7 @@ export const SessionList = () => {
   const sortedSessions = [...sessions].sort((a, b) => b.lastMessageAt - a.lastMessageAt);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col flex-1 min-h-0">
       <div className="p-4">
         <NewSessionButton onClick={() => createSession()} />
       </div>
