@@ -16,6 +16,7 @@ export const useSession = () => {
     updateSessionTitle,
     updateSessionLastMessage,
     loadSessions,
+    clearSessions,
   } = useSessionStore();
 
   const { loadMessagesForSession, clearMessages } = useChatStore();
@@ -48,6 +49,12 @@ export const useSession = () => {
     }
   };
 
+  // Smazat všechny sessions
+  const removeAllSessions = () => {
+    clearMessages();
+    clearSessions();
+  };
+
   return {
     sessions,
     activeSession,
@@ -56,6 +63,7 @@ export const useSession = () => {
     createSession: createNewSession,
     switchSession,
     deleteSession: removeSession,
+    deleteAllSessions: removeAllSessions,
     updateSessionTitle,
     updateSessionLastMessage,
     loadSessions,

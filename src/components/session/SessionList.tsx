@@ -7,15 +7,52 @@ import { SessionItem } from './SessionItem';
 import { NewSessionButton } from './NewSessionButton';
 
 export const SessionList = () => {
-  const { sessions, activeSessionId, createSession, switchSession, deleteSession } = useSession();
+  const { sessions, activeSessionId, createSession, switchSession, deleteSession, deleteAllSessions } = useSession();
 
   // Seřadit sessions podle poslední zprávy
   const sortedSessions = [...sessions].sort((a, b) => b.lastMessageAt - a.lastMessageAt);
 
+  const handleDeleteAll = () => {
+    if (sessions.length === 0) return;
+    
+    const confirmed = confirm(
+      `Opravdu chcete smazat všechny konverzace (${sessions.length})?\n\nTato akce je nevratná.`
+    );
+    
+    if (confirmed) {
+      deleteAllSessions();
+    }
+  };
+
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <div className="p-3">
+      <div className="p-3 space-y-2">
         <NewSessionButton onClick={() => createSession()} />
+        
+        {sessions.length > 0 && (
+          <button
+            onClick={handleDeleteAll}
+            className="w-full px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 cursor-pointer"
+            style={{
+              color: 'var(--color-text-tertiary)',
+              backgroundColor: 'transparent',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#dc2626';
+              e.currentTarget.style.backgroundColor = 'rgba(220, 38, 38, 0.05)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--color-text-tertiary)';
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            </svg>
+            <span>Smazat vše ({sessions.length})</span>
+          </button>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 pb-3">
