@@ -12,38 +12,45 @@ interface ConnectionStatusProps {
 export const ConnectionStatus = ({ status, reconnectAttempts = 0 }: ConnectionStatusProps) => {
   const statusConfig = {
     connected: {
-      color: 'bg-green-500',
+      color: '#10b981',
       text: 'Připojeno',
-      icon: '●',
+      bgColor: '#d1fae5',
     },
     connecting: {
-      color: 'bg-yellow-500',
+      color: '#f59e0b',
       text: 'Připojování...',
-      icon: '◐',
+      bgColor: '#fef3c7',
     },
     disconnected: {
-      color: 'bg-gray-400',
+      color: '#9ca3af',
       text: 'Odpojeno',
-      icon: '○',
+      bgColor: '#f3f4f6',
     },
     error: {
-      color: 'bg-red-500',
+      color: '#ef4444',
       text: 'Chyba připojení',
-      icon: '✕',
+      bgColor: '#fee2e2',
     },
   };
 
   const config = statusConfig[status];
 
   return (
-    <div className="flex items-center gap-2 text-sm">
-      <span className={`w-2 h-2 ${config.color} rounded-full`} aria-hidden="true">
-        {config.icon}
-      </span>
-      <span className="text-gray-700 dark:text-gray-300">{config.text}</span>
+    <div 
+      className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all"
+      style={{
+        backgroundColor: config.bgColor,
+        color: config.color,
+      }}
+    >
+      <span 
+        className="w-2 h-2 rounded-full animate-pulse"
+        style={{ backgroundColor: config.color }}
+      />
+      <span>{config.text}</span>
       {reconnectAttempts > 0 && (
-        <span className="text-gray-500 dark:text-gray-400 text-xs">
-          (pokus {reconnectAttempts})
+        <span className="opacity-70">
+          ({reconnectAttempts})
         </span>
       )}
     </div>

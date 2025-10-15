@@ -14,18 +14,20 @@ export const SessionList = () => {
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <div className="p-4">
+      <div className="p-3">
         <NewSessionButton onClick={() => createSession()} />
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pb-4">
+      <div className="flex-1 overflow-y-auto px-3 pb-3">
         {sortedSessions.length === 0 ? (
-          <div className="text-center text-gray-500 dark:text-gray-400 text-sm mt-8">
+          <div className="text-center text-sm mt-8 px-4" style={{ color: 'var(--color-text-secondary)' }}>
             <p>Zatím žádné konverzace</p>
-            <p className="text-xs mt-1">Vytvořte novou konverzaci výše</p>
+            <p className="text-xs mt-2" style={{ color: 'var(--color-text-tertiary)' }}>
+              Vytvořte novou konverzaci výše
+            </p>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {sortedSessions.map((session) => (
               <SessionItem
                 key={session.id}

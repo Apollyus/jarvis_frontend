@@ -35,38 +35,57 @@ export const ChatInput = ({
   };
 
   return (
-    <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-      <div className="flex gap-2">
-        <textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          disabled={disabled}
-          rows={1}
-          className="flex-1 resize-none input-field bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 min-h-[44px] max-h-32"
-          style={{
-            height: 'auto',
-            minHeight: '44px',
-          }}
-          onInput={(e) => {
-            const target = e.target as HTMLTextAreaElement;
-            target.style.height = 'auto';
-            target.style.height = `${Math.min(target.scrollHeight, 128)}px`;
-          }}
-        />
-        <button
-          onClick={handleSend}
-          disabled={disabled || !message.trim()}
-          className="btn-primary px-6"
-          aria-label="Odeslat zprávu"
-        >
-          <span className="text-lg">➤</span>
-        </button>
+    <div 
+      className="border-t p-6" 
+      style={{ 
+        backgroundColor: 'var(--color-surface)', 
+        borderColor: 'var(--color-border)' 
+      }}
+    >
+      <div className="max-w-4xl mx-auto">
+        <div className="flex gap-3 items-end">
+          <div className="flex-1 relative">
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={placeholder}
+              disabled={disabled}
+              rows={1}
+              className="input-field resize-none min-h-[56px] max-h-40 pr-12"
+              style={{
+                height: 'auto',
+                minHeight: '56px',
+              }}
+              onInput={(e) => {
+                const target = e.target as HTMLTextAreaElement;
+                target.style.height = 'auto';
+                target.style.height = `${Math.min(target.scrollHeight, 160)}px`;
+              }}
+            />
+          </div>
+          <button
+            onClick={handleSend}
+            disabled={disabled || !message.trim()}
+            className="p-3.5 rounded-xl transition-all flex items-center justify-center disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: 'var(--color-primary-600)',
+              color: 'white',
+              minWidth: '56px',
+              height: '56px',
+            }}
+            aria-label="Odeslat zprávu"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13" />
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+          </button>
+        </div>
+        <p className="text-xs mt-3 text-center" style={{ color: 'var(--color-text-tertiary)' }}>
+          Enter pro odeslání • Shift+Enter pro nový řádek
+        </p>
       </div>
-      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-        Enter pro odeslání, Shift+Enter pro nový řádek
-      </p>
     </div>
   );
 };

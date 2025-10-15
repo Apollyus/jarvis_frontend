@@ -24,23 +24,29 @@ export const MessageList = ({ messages, isAgentTyping }: MessageListProps) => {
 
   if (messages.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center text-gray-500 dark:text-gray-400">
-        <div className="text-center">
-          <p className="text-lg mb-2">👋</p>
-          <p>Zatím žádné zprávy</p>
-          <p className="text-sm">Začněte konverzaci se zadáním zprávy níže</p>
+      <div className="flex-1 flex items-center justify-center" style={{ color: 'var(--color-text-secondary)' }}>
+        <div className="text-center max-w-md">
+          <div className="text-5xl mb-4">�</div>
+          <h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
+            Začněte konverzaci
+          </h2>
+          <p className="text-sm">
+            Napište zprávu do pole níže a zahajte dialog s AI asistentem
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-6">
-      {messages.map((message) => (
-        <Message key={message.id} message={message} />
-      ))}
-      {isAgentTyping && <TypingIndicator />}
-      <div ref={messagesEndRef} />
+    <div className="flex-1 overflow-y-auto px-6 py-8">
+      <div className="max-w-4xl mx-auto">
+        {messages.map((message) => (
+          <Message key={message.id} message={message} />
+        ))}
+        {isAgentTyping && <TypingIndicator />}
+        <div ref={messagesEndRef} />
+      </div>
     </div>
   );
 };

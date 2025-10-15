@@ -26,14 +26,18 @@ export const ChatContainer = () => {
   }, [apiKey, isConnected, connect]);
 
   const sessionTitle = activeSession?.title || SESSION_DEFAULTS.DEFAULT_TITLE;
+  
+  // Simulace processing time - můžete nahradit reálnými daty
+  const processingTime = messages.length > 0 ? '0.8s' : undefined;
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-800">
+    <div className="flex flex-col h-full" style={{ backgroundColor: 'var(--color-background)' }}>
       <ChatHeader
         sessionTitle={sessionTitle}
         connectionStatus={status}
         reconnectAttempts={reconnectAttempts}
         onLogout={logout}
+        processingTime={processingTime}
       />
       
       <MessageList messages={messages} isAgentTyping={isAgentTyping} />
