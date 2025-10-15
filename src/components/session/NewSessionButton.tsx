@@ -14,17 +14,17 @@ export const NewSessionButton = ({ onClick, disabled = false }: NewSessionButton
       disabled={disabled}
       className="w-full px-4 py-3 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 border cursor-pointer"
       style={{
-        backgroundColor: 'var(--color-surface)',
+        backgroundColor: 'var(--color-background)',
         color: 'var(--color-text-primary)',
         borderColor: 'var(--color-border)',
       }}
       onMouseEnter={(e) => {
         if (!disabled) {
-          e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)';
+          e.currentTarget.style.backgroundColor = 'var(--color-border)';
         }
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = 'var(--color-surface)';
+        e.currentTarget.style.backgroundColor = 'var(--color-background;)';
       }}
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

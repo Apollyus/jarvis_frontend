@@ -26,7 +26,6 @@ export const MessageList = ({ messages, isAgentTyping }: MessageListProps) => {
     return (
       <div className="flex-1 flex items-center justify-center" style={{ color: 'var(--color-text-secondary)' }}>
         <div className="text-center max-w-md">
-          <div className="text-5xl mb-4">�</div>
           <h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
             Začněte konverzaci
           </h2>

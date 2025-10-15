@@ -36,11 +36,7 @@ export const ChatInput = ({
 
   return (
     <div 
-      className="border-t p-6" 
-      style={{ 
-        backgroundColor: 'var(--color-surface)', 
-        borderColor: 'var(--color-border)' 
-      }}
+      className="p-6" 
     >
       <div className="max-w-4xl mx-auto">
         <div className="flex gap-3 items-end">
@@ -82,9 +78,6 @@ export const ChatInput = ({
             </svg>
           </button>
         </div>
-        <p className="text-xs mt-3 text-center" style={{ color: 'var(--color-text-tertiary)' }}>
-          Enter pro odeslání • Shift+Enter pro nový řádek
-        </p>
       </div>
     </div>
   );

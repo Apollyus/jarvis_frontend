@@ -13,7 +13,7 @@ interface SidebarProps {
 export const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
   return (
     <aside
-      className={`flex flex-col border-r transition-all duration-300 ${
+      className={`flex flex-col border-r rounded-r-3xl transition-all duration-300 ${
         isOpen ? 'w-80' : 'w-0'
       }`}
       style={{
@@ -35,10 +35,16 @@ export const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
             </div>
             <button
               onClick={onToggle}
-              className="p-2 rounded-lg transition-colors hover:bg-opacity-80 cursor-pointer"
+              className="p-2 rounded-lg transition-colors cursor-pointer"
               style={{
-                backgroundColor: 'var(--color-secondary-100)',
+                backgroundColor: 'var(--color-background)',
                 color: 'var(--color-text-secondary)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-border)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-background)';
               }}
               aria-label="Zavřít sidebar"
             >

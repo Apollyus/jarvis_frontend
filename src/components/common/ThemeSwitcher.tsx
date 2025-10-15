@@ -7,10 +7,16 @@ export const ThemeSwitcher = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all cursor-pointer"
+      className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all cursor-pointer"
       style={{
-        backgroundColor: 'var(--color-surface-hover)',
+        backgroundColor: 'var(--color-background)',
         color: 'var(--color-text-primary)',
+      }}
+      onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-border)';
+              }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'var(--color-background)';
       }}
     >
       <span className="flex items-center gap-2">
