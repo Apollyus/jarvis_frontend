@@ -43,13 +43,31 @@ export const useWebSocket = () => {
       });
       setAgentTyping(false);
     } else if (message.type === 'status') {
-      // Status zpráva (např. "agent začal psát")
+      // Status zpráva (např. "agent začal psát" nebo "Processing...")
       if (message.message === 'typing') {
         setAgentTyping(true);
+      } else if (message.message === 'Processing...') {
+        setAgentTyping(true);
       }
+      // Ostatní status zprávy ignorujeme nebo logujeme
     } else if (message.type === 'error') {
-      // Chybová zpráva
-      setError(message.error || 'Neznámá chyba');
+      // Chybová zpráva - zobrazíme ji jako system message v chatu
+      const errorMessage = message.message || message.error || 'Neznámá chyba';
+      
+      if (!activeSessionId) {
+        console.error('WebSocket error:', errorMessage);
+        setError(errorMessage);
+        return;
+      }
+      
+      // Zobrazíme error jako system zprávu v chatu
+      addMessage({
+        sessionId: activeSessionId,
+        role: 'system',
+        content: `⚠️ ${errorMessage}`,
+        status: 'sent',
+      });
+      
       setAgentTyping(false);
     }
   }, [activeSessionId, addMessage, setAgentTyping, setError]);

@@ -21,11 +21,18 @@ class WebSocketServiceClass {
    * Připojit WebSocket
    */
   connect(apiKey: string): void {
-    // Pokud už existuje socket, a je v procesu připojování nebo již otevřen,
+    // Pokud se API klíč změnil, odpojit starý socket
+    if (this.currentApiKey && this.currentApiKey !== apiKey && this.ws) {
+      console.log('🔄 API klíč se změnil, odpojuji starý socket...');
+      this.ws.close();
+      this.ws = null;
+    }
+
+    // Pokud už existuje socket se STEJNÝM klíčem, a je v procesu připojování nebo již otevřen,
     // nepokoušíme se vytvořit nový - zabrání to duplikovaným spojením.
     const wsState = this.ws?.readyState;
-    if (wsState === WebSocket.OPEN || wsState === WebSocket.CONNECTING) {
-      // už máme aktivní nebo probíhající spojení
+    if ((wsState === WebSocket.OPEN || wsState === WebSocket.CONNECTING) && this.currentApiKey === apiKey) {
+      console.log('✅ WebSocket už je připojen se stejným API klíčem');
       return;
     }
 
@@ -35,11 +42,15 @@ class WebSocketServiceClass {
       this.reconnectTimeout = null;
     }
 
+    // Reset manuallyClosed flag když voláme connect explicitně
+    this.manuallyClosed = false;
     this.currentApiKey = apiKey;
     this.updateStatus('connecting');
 
     try {
       const wsUrl = `${API_CONFIG.WS_URL}?api_key=${apiKey}`;
+      console.log('🔌 Connecting to WebSocket...');
+      
       this.ws = new WebSocket(wsUrl);
 
       this.ws.onopen = this.handleOpen.bind(this);
@@ -157,6 +168,19 @@ class WebSocketServiceClass {
    */
   private handleClose(event: CloseEvent): void {
     console.log('WebSocket odpojen', { code: event.code, reason: event.reason });
+    
+    // Vypisování specifických důvodů podle kódu
+    if (event.code === 1001) {
+      console.error('⚠️ WebSocket zavřen serverem (code 1001 - Going Away)');
+      console.error('💡 Backend pravděpodobně odmítl připojení - zkontrolujte backend logy');
+    } else if (event.code === 1006) {
+      console.error('⚠️ WebSocket zavřen abnormálně (code 1006)');
+      console.error('💡 Možná síťový problém nebo backend spadl');
+    } else if (event.code === 1008) {
+      console.error('⚠️ WebSocket zavřen kvůli policy violation (code 1008)');
+      console.error('💡 Možná špatný API klíč nebo nedostatečná oprávnění');
+    }
+    
     this.updateStatus('disconnected');
 
     // Pokud bylo explicitně zavřeno uživatelem, nedělej reconnect

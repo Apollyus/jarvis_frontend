@@ -18,12 +18,13 @@ export const ChatContainer = () => {
   const { status, reconnectAttempts, connect, isConnected } = useWebSocket();
   const { apiKey, logout } = useAuth();
 
-  // Připojit WebSocket při mount
+  // Připojit WebSocket při mount nebo změně API klíče
   useEffect(() => {
-    if (apiKey && !isConnected) {
+    if (apiKey) {
       connect(apiKey);
     }
-  }, [apiKey, isConnected, connect]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiKey]); // Pouze apiKey v dependencies! connect() je stabilní funkce ze store
 
   const sessionTitle = activeSession?.title || SESSION_DEFAULTS.DEFAULT_TITLE;
   
