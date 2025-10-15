@@ -14,7 +14,7 @@ import { SESSION_DEFAULTS } from '../../utils/constants';
 
 export const ChatContainer = () => {
   const { messages, isAgentTyping, sendMessage } = useChat();
-  const { activeSession } = useSession();
+  const { activeSession, updateSessionTitle } = useSession();
   const { status, reconnectAttempts, connect, isConnected } = useWebSocket();
   const { apiKey, logout } = useAuth();
 
@@ -30,17 +30,27 @@ export const ChatContainer = () => {
   // Simulace processing time - můžete nahradit reálnými daty
   const processingTime = messages.length > 0 ? '0.8s' : undefined;
 
+  const handleTitleChange = (newTitle: string) => {
+    if (activeSession?.id) {
+      updateSessionTitle(activeSession.id, newTitle);
+    }
+  };
+
   return (
     <div className="flex flex-col h-full" style={{ backgroundColor: 'var(--color-background)' }}>
       <ChatHeader
-        sessionTitle={sessionTitle}
         connectionStatus={status}
         reconnectAttempts={reconnectAttempts}
         onLogout={logout}
-        processingTime={processingTime}
       />
       
-      <MessageList messages={messages} isAgentTyping={isAgentTyping} />
+      <MessageList 
+        messages={messages} 
+        isAgentTyping={isAgentTyping}
+        sessionTitle={sessionTitle}
+        processingTime={processingTime}
+        onTitleChange={handleTitleChange}
+      />
       
       <ChatInput
         onSend={sendMessage}
