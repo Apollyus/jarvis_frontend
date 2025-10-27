@@ -5,6 +5,7 @@
 import { create } from 'zustand';
 import { AuthService } from '../services/authService';
 import { StorageService } from '../services/storageService';
+import { SessionService } from '../services/sessionService';
 import type { LoginCredentials } from '../types';
 
 interface AuthStore {
@@ -37,6 +38,10 @@ export const useAuthStore = create<AuthStore>((set) => ({
     try {
       const response = await AuthService.login(credentials);
       StorageService.saveApiKey(response.api_key);
+      
+      // Nastavit API klíč pro SessionService
+      SessionService.setApiKey(response.api_key);
+      
       set({
         isAuthenticated: true,
         apiKey: response.api_key,
@@ -62,6 +67,10 @@ export const useAuthStore = create<AuthStore>((set) => ({
       
       if (isValid) {
         StorageService.saveApiKey(apiKey);
+        
+        // Nastavit API klíč pro SessionService
+        SessionService.setApiKey(apiKey);
+        
         set({
           isAuthenticated: true,
           apiKey,
@@ -101,6 +110,9 @@ export const useAuthStore = create<AuthStore>((set) => ({
   restoreSession: () => {
     const apiKey = StorageService.getApiKey();
     if (apiKey) {
+      // Nastavit API klíč pro SessionService
+      SessionService.setApiKey(apiKey);
+      
       set({
         isAuthenticated: true,
         apiKey,

@@ -10,6 +10,7 @@ export interface WSMessage {
   type: 'status' | 'response' | 'error';
   message?: string;
   error?: string;
+  session_id?: string; // Backend vrací session_id v response
   timestamp?: number;
 }
 
@@ -17,7 +18,7 @@ export interface WSMessage {
  * WebSocket zpráva pro odeslání
  */
 export interface WSOutgoingMessage {
-  session_id: string;
+  session_id?: string; // Volitelné - pokud není, backend vytvoří nový
   message: string;
   timestamp: number;
 }

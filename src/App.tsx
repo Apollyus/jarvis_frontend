@@ -12,26 +12,21 @@ import { LoginPage } from './pages/LoginPage';
 
 function App() {
   const { isAuthenticated, restoreSession } = useAuth();
-  const { loadSessions, createSession, sessions, activeSessionId } = useSession();
+  const { loadSessions } = useSession();
 
   // Při mount obnovit session a načíst sessions
   useEffect(() => {
     restoreSession();
   }, [restoreSession]);
 
-  // Načíst sessions po přihlášení
+  // Načíst sessions po přihlášení z backendu
   useEffect(() => {
     if (isAuthenticated) {
       loadSessions();
     }
   }, [isAuthenticated, loadSessions]);
 
-  // Vytvořit první session pokud žádná neexistuje
-  useEffect(() => {
-    if (isAuthenticated && sessions.length === 0 && !activeSessionId) {
-      createSession();
-    }
-  }, [isAuthenticated, sessions.length, activeSessionId, createSession]);
+  // NEBUDEME automaticky vytvářet session - backend ji vytvoří při první zprávě
 
   // Pokud není přihlášen, zobrazit login
   if (!isAuthenticated) {

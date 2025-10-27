@@ -1,10 +1,10 @@
 /**
- * Chat Store - Správa chatových zpráv
+ * Chat Store - Správa chatových zpráv s backend integrací
  */
 
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
-import { StorageService } from '../services/storageService';
+import { SessionService } from '../services/sessionService';
 import type { ChatMessage, MessageStatus } from '../types';
 
 interface ChatStore {
@@ -12,14 +12,17 @@ interface ChatStore {
   messages: ChatMessage[];
   isAgentTyping: boolean;
   error: string | null;
+  currentSessionId: string | null; // Aktuální session_id z backendu
 
   // Actions
   addMessage: (message: Omit<ChatMessage, 'id' | 'timestamp'>) => ChatMessage;
   updateMessageStatus: (id: string, status: MessageStatus, error?: string) => void;
   setAgentTyping: (isTyping: boolean) => void;
   clearMessages: () => void;
-  loadMessagesForSession: (sessionId: string) => void;
+  loadMessagesForSession: (sessionId: string) => Promise<void>;
   setError: (error: string | null) => void;
+  setCurrentSessionId: (sessionId: string | null) => void;
+  getCurrentSessionId: () => string | null;
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -27,6 +30,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   messages: [],
   isAgentTyping: false,
   error: null,
+  currentSessionId: null,
 
   // Přidat novou zprávu
   addMessage: (messageData) => {
@@ -55,8 +59,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     set((state) => {
       const newMessages = [...state.messages, message];
       console.log('💾 ChatStore: Total messages now:', newMessages.length);
-      // Uložit do storage
-      StorageService.saveMessages(message.sessionId, newMessages);
+      // Zprávy jsou nyní na backendu, neukládáme do LocalStorage
       return { messages: newMessages };
     });
 
@@ -70,12 +73,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         msg.id === id ? { ...msg, status, error } : msg
       );
       
-      // Uložit do storage
-      const sessionId = state.messages.find(msg => msg.id === id)?.sessionId;
-      if (sessionId) {
-        StorageService.saveMessages(sessionId, newMessages);
-      }
-      
+      // Zprávy jsou na backendu, neukládáme do LocalStorage
       return { messages: newMessages };
     });
   },
@@ -83,15 +81,48 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   // Nastavit stav "agent píše"
   setAgentTyping: (isTyping) => set({ isAgentTyping: isTyping }),
 
-  // Vymazat všechny zprávy
-  clearMessages: () => set({ messages: [] }),
+  // Vymazat všechny zprávy (pouze lokálně)
+  clearMessages: () => set({ messages: [], currentSessionId: null }),
 
-  // Načíst zprávy pro konkrétní session
-  loadMessagesForSession: (sessionId) => {
-    const messages = StorageService.getMessages(sessionId);
-    set({ messages, error: null });
+  // Načíst zprávy pro konkrétní session z backendu
+  loadMessagesForSession: async (sessionId) => {
+    try {
+      console.log('📥 Loading messages for session:', sessionId);
+      const history = await SessionService.getSessionHistory(sessionId);
+      
+      // Převést backend historii na ChatMessage objekty
+      const messages: ChatMessage[] = history.history.map((msg, index) => ({
+        id: `${sessionId}-${index}`, // Generujeme ID z pozice
+        sessionId: sessionId,
+        role: msg.role === 'assistant' ? 'agent' : 'user', // Backend používá 'assistant', my 'agent'
+        content: msg.content,
+        timestamp: Date.now() - (history.history.length - index) * 1000, // Odhad timestampu
+        status: 'sent' as MessageStatus,
+      }));
+
+      set({ 
+        messages, 
+        error: null,
+        currentSessionId: sessionId,
+      });
+
+      console.log('✅ Messages loaded from backend:', messages.length);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Nepodařilo se načíst zprávy';
+      console.error('❌ Chyba při načítání zpráv:', error);
+      set({ error: errorMessage, messages: [] });
+    }
   },
 
   // Nastavit chybu
   setError: (error) => set({ error }),
+
+  // Nastavit aktuální session ID (z backendu)
+  setCurrentSessionId: (sessionId) => {
+    console.log('🔑 Setting current session ID:', sessionId);
+    set({ currentSessionId: sessionId });
+  },
+
+  // Získat aktuální session ID
+  getCurrentSessionId: () => get().currentSessionId,
 }));

@@ -18,6 +18,7 @@ export const useChat = () => {
     setAgentTyping,
     loadMessagesForSession,
     clearMessages,
+    getCurrentSessionId,
   } = useChatStore();
 
   const { activeSessionId, updateSessionLastMessage } = useSessionStore();
@@ -26,46 +27,56 @@ export const useChat = () => {
   // Odeslat zprávu
   const sendMessage = useCallback(
     (content: string) => {
-      if (!activeSessionId) {
-        console.error('Žádná aktivní session');
-        return;
-      }
-
       if (!isConnected) {
         console.error('WebSocket není připojen');
         return;
       }
 
-      // Přidat uživatelskou zprávu
+      // Získat aktuální session_id z ChatStore (může být null pro první zprávu)
+      const currentSessionId = getCurrentSessionId();
+      
+      // Přidat uživatelskou zprávu (použijeme activeSessionId nebo currentSessionId jako fallback)
+      const sessionIdForMessage = currentSessionId || activeSessionId || 'temp';
+      
       const userMessage = addMessage({
-        sessionId: activeSessionId,
+        sessionId: sessionIdForMessage,
         role: 'user' as MessageRole,
         content,
         status: 'sending',
       });
 
-      // Odeslat přes WebSocket
+      // Odeslat přes WebSocket - session_id je volitelné
+      // Pokud je null/undefined, backend vytvoří nový
       try {
-        send({
-          session_id: activeSessionId,
+        const payload: any = {
           message: content,
           timestamp: Date.now(),
-        });
+        };
+        
+        // Přidat session_id pouze pokud existuje
+        if (currentSessionId) {
+          payload.session_id = currentSessionId;
+        }
+        
+        console.log('📤 Sending message with payload:', payload);
+        
+        send(payload);
 
-        // Aktualizovat status na sent s malým zpožděním, aby se předešlo race condition
-        // se přidáním zprávy do stavu.
+        // Aktualizovat status na sent s malým zpožděním
         setTimeout(() => {
           updateMessageStatus(userMessage.id, 'sent');
         }, 0);
 
-        // Aktualizovat session
-        updateSessionLastMessage(activeSessionId);
+        // Aktualizovat session (pokud existuje)
+        if (currentSessionId && activeSessionId) {
+          updateSessionLastMessage(activeSessionId);
+        }
       } catch (error) {
         console.error('Chyba při odesílání zprávy:', error);
         updateMessageStatus(userMessage.id, 'error', 'Nepodařilo se odeslat zprávu');
       }
     },
-    [activeSessionId, isConnected, addMessage, send, updateMessageStatus, updateSessionLastMessage]
+    [isConnected, addMessage, send, updateMessageStatus, updateSessionLastMessage, activeSessionId, getCurrentSessionId]
   );
 
   // Přidat odpověď od agenta

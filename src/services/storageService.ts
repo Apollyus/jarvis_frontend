@@ -1,8 +1,8 @@
 /**
- * Storage Service - Správa LocalStorage pro persistence dat
+ * Storage Service - Správa LocalStorage (pouze API klíč)
+ * Sessions a zprávy jsou nyní na backendu (Redis)
  */
 
-import type { ChatSession, ChatMessage } from '../types';
 import { STORAGE_KEYS } from '../utils/constants';
 
 class StorageServiceClass {
@@ -41,110 +41,24 @@ class StorageServiceClass {
   }
 
   /**
-   * Uložit seznam sessions
-   */
-  saveSessions(sessions: ChatSession[]): void {
-    try {
-      localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(sessions));
-    } catch (error) {
-      console.error('Chyba při ukládání sessions:', error);
-    }
-  }
-
-  /**
-   * Načíst seznam sessions
-   */
-  getSessions(): ChatSession[] {
-    try {
-      const data = localStorage.getItem(STORAGE_KEYS.SESSIONS);
-      return data ? JSON.parse(data) : [];
-    } catch (error) {
-      console.error('Chyba při načítání sessions:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Uložit zprávy pro konkrétní session
-   */
-  saveMessages(sessionId: string, messages: ChatMessage[]): void {
-    try {
-      const key = `${STORAGE_KEYS.MESSAGES_PREFIX}${sessionId}`;
-      localStorage.setItem(key, JSON.stringify(messages));
-    } catch (error) {
-      console.error('Chyba při ukládání zpráv:', error);
-    }
-  }
-
-  /**
-   * Načíst zprávy pro konkrétní session
-   */
-  getMessages(sessionId: string): ChatMessage[] {
-    try {
-      const key = `${STORAGE_KEYS.MESSAGES_PREFIX}${sessionId}`;
-      const data = localStorage.getItem(key);
-      return data ? JSON.parse(data) : [];
-    } catch (error) {
-      console.error('Chyba při načítání zpráv:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Smazat zprávy pro konkrétní session
-   */
-  clearMessages(sessionId: string): void {
-    try {
-      const key = `${STORAGE_KEYS.MESSAGES_PREFIX}${sessionId}`;
-      localStorage.removeItem(key);
-    } catch (error) {
-      console.error('Chyba při mazání zpráv:', error);
-    }
-  }
-
-  /**
-   * Uložit ID aktivní session
-   */
-  saveActiveSessionId(sessionId: string | null): void {
-    try {
-      if (sessionId) {
-        localStorage.setItem(STORAGE_KEYS.ACTIVE_SESSION, sessionId);
-      } else {
-        localStorage.removeItem(STORAGE_KEYS.ACTIVE_SESSION);
-      }
-    } catch (error) {
-      console.error('Chyba při ukládání aktivní session:', error);
-    }
-  }
-
-  /**
-   * Načíst ID aktivní session
-   */
-  getActiveSessionId(): string | null {
-    try {
-      return localStorage.getItem(STORAGE_KEYS.ACTIVE_SESSION);
-    } catch (error) {
-      console.error('Chyba při načítání aktivní session:', error);
-      return null;
-    }
-  }
-
-  /**
    * Vymazat všechna data
    */
   clearAll(): void {
     try {
-      // Vymazat API klíč
       this.clearApiKey();
-      
-      // Vymazat sessions
-      const sessions = this.getSessions();
-      sessions.forEach(session => {
-        this.clearMessages(session.id);
-      });
-      
+      // Vymazat i staré keys pokud existují
       localStorage.removeItem(STORAGE_KEYS.SESSIONS);
       localStorage.removeItem(STORAGE_KEYS.ACTIVE_SESSION);
+      
+      // Vymazat všechny message keys (začínají prefix)
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(STORAGE_KEYS.MESSAGES_PREFIX)) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
     } catch (error) {
       console.error('Chyba při mazání všech dat:', error);
     }

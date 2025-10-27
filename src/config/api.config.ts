@@ -10,7 +10,17 @@ export const API_CONFIG = {
 } as const;
 
 export const API_ENDPOINTS = {
+  // Auth
   LOGIN: '/api/auth/login',
   LOGOUT: '/api/auth/logout',
   VALIDATE_KEY: '/api/auth/validate',
+  
+  // Sessions
+  SESSIONS: '/api/sessions',
+  SESSION_NEW: '/api/sessions/new',
+  SESSION_BY_ID: (id: string) => `/api/sessions/${id}`,
+  SESSION_HISTORY: (id: string) => `/api/sessions/${id}/history`,
+  
+  // Chat
+  CHAT: '/api/chat',
 } as const;

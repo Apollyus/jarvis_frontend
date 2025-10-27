@@ -23,20 +23,35 @@ export const useWebSocket = () => {
   } = useWebSocketStore();
 
   const { addMessage, setAgentTyping } = useChatStore();
-  const { activeSessionId } = useSessionStore();
+  const { activeSessionId, setActiveSession } = useSessionStore();
+  const { setCurrentSessionId } = useChatStore();
 
   // Handler pro příchozí zprávy
   const handleMessage = useCallback((message: WSMessage) => {
     console.log('🔵 WebSocket received message:', message);
     
+    // Backend vrací session_id v response - uložíme ho
+    if (message.session_id) {
+      console.log('🔑 Received session_id from backend:', message.session_id);
+      setCurrentSessionId(message.session_id);
+      
+      // Aktualizovat session store s novým session_id
+      if (!activeSessionId || activeSessionId !== message.session_id) {
+        setActiveSession(message.session_id);
+      }
+    }
+    
     if (message.type === 'response' && message.message) {
-      if (!activeSessionId) {
-        console.error('Chyba: Přijata zpráva od agenta, ale není aktivní session.');
+      const sessionId = message.session_id || activeSessionId;
+      
+      if (!sessionId) {
+        console.error('Chyba: Přijata zpráva od agenta, ale není session_id.');
         return;
       }
+      
       // Agent odpověď
       addMessage({
-        sessionId: activeSessionId,
+        sessionId: sessionId,
         role: 'agent',
         content: message.message,
         status: 'sent',
@@ -53,8 +68,9 @@ export const useWebSocket = () => {
     } else if (message.type === 'error') {
       // Chybová zpráva - zobrazíme ji jako system message v chatu
       const errorMessage = message.message || message.error || 'Neznámá chyba';
+      const sessionId = message.session_id || activeSessionId;
       
-      if (!activeSessionId) {
+      if (!sessionId) {
         console.error('WebSocket error:', errorMessage);
         setError(errorMessage);
         return;
@@ -62,7 +78,7 @@ export const useWebSocket = () => {
       
       // Zobrazíme error jako system zprávu v chatu
       addMessage({
-        sessionId: activeSessionId,
+        sessionId: sessionId,
         role: 'system',
         content: `⚠️ ${errorMessage}`,
         status: 'sent',
