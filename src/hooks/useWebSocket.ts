@@ -23,7 +23,7 @@ export const useWebSocket = () => {
   } = useWebSocketStore();
 
   const { addMessage, setAgentTyping } = useChatStore();
-  const { activeSessionId, setActiveSession } = useSessionStore();
+  const { activeSessionId, setActiveSession, addSessionFromBackend } = useSessionStore();
   const { setCurrentSessionId } = useChatStore();
 
   // Handler pro příchozí zprávy
@@ -38,6 +38,8 @@ export const useWebSocket = () => {
       // Aktualizovat session store s novým session_id
       if (!activeSessionId || activeSessionId !== message.session_id) {
         setActiveSession(message.session_id);
+        // Přidat session do seznamu pokud tam ještě není
+        addSessionFromBackend(message.session_id);
       }
     }
     

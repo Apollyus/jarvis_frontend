@@ -21,9 +21,11 @@ interface SessionStore {
   updateSessionTitle: (sessionId: string, title: string) => void;
   updateSessionLastMessage: (sessionId: string) => void;
   loadSessions: () => Promise<void>;
+  refreshSessions: () => Promise<void>; // 🆕 Alias pro loadSessions (ale s background refresh)
   loadSessionInfo: (sessionId: string) => Promise<void>;
   clearSessions: () => void;
   setError: (error: string | null) => void;
+  addSessionFromBackend: (sessionId: string) => Promise<void>; // 🆕 Přidat session z backendu
 }
 
 export const useSessionStore = create<SessionStore>((set, get) => ({
@@ -215,4 +217,92 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
 
   // Nastavit chybu
   setError: (error) => set({ error }),
+
+  // Refresh sessions z backendu (bez loading state pro seamless update)
+  refreshSessions: async () => {
+    try {
+      const response = await SessionService.getSessions();
+      const { sessions: currentSessions } = get();
+      
+      // Načíst info pro nové sessions (které ještě nemáme)
+      const currentIds = new Set(currentSessions.map(s => s.id));
+      const newSessionIds = response.sessions.filter(id => !currentIds.has(id));
+      
+      const newSessions: (ChatSession | null)[] = await Promise.all(
+        newSessionIds.map(async (sessionId) => {
+          try {
+            const info = await SessionService.getSessionInfo(sessionId);
+            return {
+              id: sessionId,
+              title: SESSION_DEFAULTS.DEFAULT_TITLE,
+              createdAt: new Date(info.updated_at).getTime(),
+              lastMessageAt: new Date(info.updated_at).getTime(),
+              messageCount: info.message_count,
+            };
+          } catch (error) {
+            console.error('Chyba při načítání info pro novou session:', sessionId, error);
+            return null;
+          }
+        })
+      );
+
+      // Odfiltrovat null hodnoty a mergovat s existujícími
+      const validNewSessions = newSessions.filter((s): s is ChatSession => s !== null);
+      
+      if (validNewSessions.length > 0) {
+        set((state) => {
+          const allSessions = [...state.sessions, ...validNewSessions];
+          // Seřadit podle lastMessageAt (nejnovější první)
+          allSessions.sort((a, b) => b.lastMessageAt - a.lastMessageAt);
+          
+          console.log('✅ Refreshed sessions, added:', validNewSessions.length);
+          return { sessions: allSessions };
+        });
+      }
+
+      // Odstranit sessions které už nejsou na backendu
+      const backendIds = new Set(response.sessions);
+      set((state) => {
+        const filteredSessions = state.sessions.filter(s => backendIds.has(s.id));
+        if (filteredSessions.length !== state.sessions.length) {
+          console.log('✅ Removed deleted sessions:', state.sessions.length - filteredSessions.length);
+          return { sessions: filteredSessions };
+        }
+        return state;
+      });
+    } catch (error) {
+      console.error('❌ Chyba při refresh sessions:', error);
+    }
+  },
+
+  // Přidat session z backendu (když dostaneme nové session_id)
+  addSessionFromBackend: async (sessionId: string) => {
+    const { sessions } = get();
+    
+    // Pokud už session máme, nic nedělat
+    if (sessions.some(s => s.id === sessionId)) {
+      console.log('Session už existuje:', sessionId);
+      return;
+    }
+
+    try {
+      const info = await SessionService.getSessionInfo(sessionId);
+      
+      const newSession: ChatSession = {
+        id: sessionId,
+        title: SESSION_DEFAULTS.DEFAULT_TITLE,
+        createdAt: new Date(info.updated_at).getTime(),
+        lastMessageAt: new Date(info.updated_at).getTime(),
+        messageCount: info.message_count,
+      };
+
+      set((state) => {
+        const newSessions = [newSession, ...state.sessions];
+        console.log('✅ Session přidána z backendu:', sessionId);
+        return { sessions: newSessions };
+      });
+    } catch (error) {
+      console.error('❌ Chyba při přidávání session z backendu:', error);
+    }
+  },
 }));

@@ -17,6 +17,7 @@ export const useSession = () => {
     updateSessionTitle,
     updateSessionLastMessage,
     loadSessions,
+    refreshSessions,
     clearSessions,
   } = useSessionStore();
 
@@ -83,5 +84,6 @@ export const useSession = () => {
     updateSessionTitle,
     updateSessionLastMessage,
     loadSessions,
+    refreshSessions, // 🆕 Export refresh metody
   };
 };

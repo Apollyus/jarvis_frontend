@@ -12,7 +12,7 @@ import { LoginPage } from './pages/LoginPage';
 
 function App() {
   const { isAuthenticated, restoreSession } = useAuth();
-  const { loadSessions } = useSession();
+  const { loadSessions, refreshSessions } = useSession();
 
   // Při mount obnovit session a načíst sessions
   useEffect(() => {
@@ -25,6 +25,18 @@ function App() {
       loadSessions();
     }
   }, [isAuthenticated, loadSessions]);
+
+  // 🆕 Periodický refresh sessions (každých 30 sekund) pro synchronizaci mezi zařízeními
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const intervalId = setInterval(() => {
+      console.log('🔄 Auto-refreshing sessions from backend...');
+      refreshSessions();
+    }, 30000); // 30 sekund
+
+    return () => clearInterval(intervalId);
+  }, [isAuthenticated, refreshSessions]);
 
   // NEBUDEME automaticky vytvářet session - backend ji vytvoří při první zprávě
 
