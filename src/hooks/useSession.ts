@@ -21,7 +21,7 @@ export const useSession = () => {
     clearSessions,
   } = useSessionStore();
 
-  const { loadMessagesForSession, clearMessages } = useChatStore();
+  const { loadMessagesForSession, clearMessages, setCurrentSessionId } = useChatStore();
 
   // Aktivní session objekt
   const activeSession = sessions.find((s) => s.id === activeSessionId) || null;
@@ -38,6 +38,7 @@ export const useSession = () => {
     try {
       const newSessionId = await createSession();
       clearMessages(); // Vymazat staré zprávy z UI
+      setCurrentSessionId(newSessionId); // 🔑 Nastavit currentSessionId pro odesílání zpráv
       return newSessionId;
     } catch (error) {
       console.error('Chyba při vytváření nové session:', error);

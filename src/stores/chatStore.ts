@@ -82,7 +82,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   setAgentTyping: (isTyping) => set({ isAgentTyping: isTyping }),
 
   // Vymazat všechny zprávy (pouze lokálně)
-  clearMessages: () => set({ messages: [], currentSessionId: null }),
+  clearMessages: () => set({ messages: [] }), // 🔑 Nemazat currentSessionId!
 
   // Načíst zprávy pro konkrétní session z backendu
   loadMessagesForSession: async (sessionId) => {
@@ -103,7 +103,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       set({ 
         messages, 
         error: null,
-        currentSessionId: sessionId,
+        currentSessionId: sessionId, // 🔑 Nastavit currentSessionId při načtení zpráv
       });
 
       console.log('✅ Messages loaded from backend:', messages.length);
