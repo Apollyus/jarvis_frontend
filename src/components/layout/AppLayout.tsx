@@ -13,7 +13,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
-    <div className="flex h-screen h-100dvh overflow-hidden" style={{ backgroundColor: 'var(--color-background)' }}>
+    <div className="flex h-dvh overflow-hidden" style={{ backgroundColor: 'var(--color-background)' }}>
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       <main className="flex-1 flex flex-col overflow-hidden transition-all duration-300">
         {/* Tlačítko pro otevření sidebaru když je zavřený */}
